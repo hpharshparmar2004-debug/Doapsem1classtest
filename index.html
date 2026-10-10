@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Computer Theory — CBT Examination Portal</title>
+    <style>
+        :root {
+            --primary-blue: #0f172a;
+            --secondary-blue: #2563eb;
+            --light-blue: #eff6ff;
+            --border-color: #cbd5e1;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --success-green: #16a34a;
+            --warning-red: #dc2626;
+            --review-purple: #9333ea;
+            --not-visited: #94a3b8;
+            --bg-color: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex !important;
+        }
+
+        #login-screen {
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card h2 {
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .login-card p {
+            color: var(--text-light);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .error-msg {
+            color: var(--warning-red);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .demo-credentials {
+            margin-top: 20px;
+            padding: 12px;
+            background: var(--light-blue);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--primary-blue);
+            line-height: 1.5;
+        }
+
+        #instructions-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg-color);
+        }
+
+        .instruction-card {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .instruction-card h2 {
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+        }
+
+        .instruction-card h4 {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .exam-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+            background: var(--light-blue);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .instruction-rules {
+            margin-bottom: 25px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .instruction-rules ul {
+            padding-left: 20px;
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .instruction-rules li {
+            margin-bottom: 8px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        #exam-screen {
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .fullscreen-bar {
+            background: #0f172a;
+            color: white;
+            font-size: 12px;
+            padding: 4px 15px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .fullscreen-bar button {
+            background: none; border: none; color: #93c5fd; cursor: pointer; text-decoration: underline; font-size: 12px;
+        }
+
+        .exam-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .exam-header h3 {
+            font-size: 18px;
+        }
+
+        .timer-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .exam-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .question-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+
+        .option-item:hover {
+            border-color: var(--secondary-blue);
+            background-color: var(--light-blue);
+        }
+
+        .option-item input {
+            margin-right: 14px;
+            transform: scale(1.2);
+            accent-color: var(--secondary-blue);
+        }
+
+        .option-item.selected {
+            border-color: var(--secondary-blue);
+            background-color: var(--light-blue);
+            font-weight: 500;
+        }
+
+        .exam-footer-controls {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-group-left, .btn-group-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #f1f5f9;
+        }
+
+        .btn-primary-action {
+            background: var(--secondary-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary-action:hover {
+            background: #1d4ed8;
+        }
+
+        aside.palette-sidebar {
+            width: 320px;
+            background: #f8fafc;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .palette-header {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .palette-legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+            max-height: calc(100vh - 280px);
+        }
+
+        .palette-btn {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .palette-btn.current {
+            border: 2px solid var(--secondary-blue);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .palette-btn.not-visited { background: #ffffff; color: var(--not-visited); border-color: var(--not-visited); }
+        .palette-btn.visited-not-answered { background: #fee2e2; color: var(--warning-red); border-color: #fca5a5; }
+        .palette-btn.answered { background: #dcfce7; color: var(--success-green); border-color: #86efac; }
+        .palette-btn.marked { background: #f3e8ff; color: var(--review-purple); border-color: #d8b4fe; }
+        .palette-btn.answered-marked { background: linear-gradient(135deg, #dcfce7 50%, #f3e8ff 50%); color: var(--primary-blue); border-color: var(--review-purple); }
+
+        .submit-exam-btn {
+            margin-top: 15px;
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+        .submit-exam-btn:hover { background: #15803d; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h3 { margin-bottom: 15px; color: var(--primary-blue); }
+        .modal-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .modal-stats div {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: var(--light-blue);
+            border-radius: 6px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        #result-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+            margin: auto;
+        }
+
+        .result-card h2 { color: var(--primary-blue); margin-bottom: 6px; }
+        .score-circle {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: var(--light-blue);
+            color: var(--secondary-blue);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            font-size: 28px;
+            font-weight: 700;
+            border: 4px solid var(--secondary-blue);
+        }
+        .score-circle span { font-size: 13px; font-weight: 500; color: var(--text-light); }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .result-item {
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .result-item span { font-weight: 700; float: right; }
+
+        @media(max-width: 768px) {
+            .exam-body { flex-direction: column-reverse; overflow-y: auto; }
+            aside.palette-sidebar { width: 100%; height: 240px; }
+            .palette-grid { max-height: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen active">
+        <div class="login-card">
+            <h2>CBT Examination Portal</h2>
+            <p>Advanced Computer Theory &amp; Applications</p>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Candidate Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username (e.g. admin100)" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Show</button>
+                </div>
+                <button type="submit" class="btn">Proceed to Instructions</button>
+                <div id="login-error" class="error-msg">Invalid username or password. Please try again.</div>
+            </form>
+            <div class="demo-credentials">
+                <strong>Demo Credentials:</strong><br>
+                Candidate 1: Username: <code>admin100</code> | Password: <code>100</code><br>
+                Candidate 2: Username: <code>admin101</code> | Password: <code>101</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTRUCTIONS SCREEN -->
+    <div id="instructions-screen" class="screen">
+        <div class="instruction-card">
+            <h2>Examination Instructions</h2>
+            <h4>Advanced Computer Theory Assessment (100 Questions)</h4>
+            
+            <div class="exam-details-grid">
+                <div><strong>Test Scope:</strong> Notepad, WordPad, Paint, DOS, Shortcuts, Full Forms, Word, Excel, PPT, Access, HTML</div>
+                <div><strong>Total Questions:</strong> 100</div>
+                <div><strong>Duration:</strong> 60 Minutes</div>
+                <div><strong>Maximum Marks:</strong> 100</div>
+                <div><strong>Question Type:</strong> Single-correct MCQ</div>
+                <div><strong>Negative Marking:</strong> None</div>
+            </div>
+
+            <div class="instruction-rules">
+                <ul>
+                    <li>The clock has been set at the server and the countdown timer at the top right corner of your screen will display remaining time.</li>
+                    <li>The question palette on the right side indicates status: Not Visited, Visited but Not Answered, Answered, Marked for Review.</li>
+                    <li>Click on any question number in the palette to navigate to it instantly.</li>
+                    <li>Select options by clicking radio buttons or option cards.</li>
+                    <li>Use <strong>Save &amp; Next</strong> or <strong>Mark for Review &amp; Next</strong> to record responses.</li>
+                    <li>The examination submits automatically when the timer reaches zero.</li>
+                </ul>
+            </div>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="accept-instructions" onchange="toggleStartExamBtn()">
+                I have read and understood all instructions. All computer hardware is in proper working condition.
+            </label>
+
+            <button type="button" id="start-exam-btn" class="btn" disabled style="opacity: 0.6; cursor: not-allowed;" onclick="startExamination()">Start Examination</button>
+        </div>
+    </div>
+
+    <!-- CBT EXAMINATION SCREEN -->
+    <div id="exam-screen" class="screen">
+        <div class="fullscreen-bar">
+            <span>Candidate ID: <strong id="display-candidate">admin</strong></span>
+            <span style="margin-left: 20px;">Mode: CBT Theory Assessment</span>
+            <span style="float: right;"><button onclick="toggleFullscreen()">Toggle Fullscreen</button></span>
+        </div>
+        <div class="exam-header">
+            <h3>ADVANCED COMPUTER THEORY PRACTICE SET</h3>
+            <div class="timer-badge" id="timer-display">60:00</div>
+        </div>
+        <div class="exam-body">
+            <div class="question-container">
+                <div class="question-meta">
+                    <span id="question-number-tag">Question 1 of 100</span>
+                    <span>Marks: +1.0 | Negative: 0.0</span>
+                </div>
+                <div class="question-text" id="question-title-text">
+                    Loading question...
+                </div>
+                <div class="options-list" id="options-container"></div>
+                <div class="exam-footer-controls">
+                    <div class="btn-group-left">
+                        <button class="btn-action" onclick="markForReviewAndNext()">Mark for Review &amp; Next</button>
+                        <button class="btn-action" onclick="clearResponse()">Clear Response</button>
+                    </div>
+                    <div class="btn-group-right">
+                        <button class="btn-action" onclick="previousQuestion()">Previous</button>
+                        <button class="btn-action btn-primary-action" onclick="saveAndNext()">Save &amp; Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="palette-sidebar">
+                <div class="palette-header">Question Palette</div>
+                <div class="palette-legend">
+                    <div class="legend-item"><div class="legend-dot" style="background:#ffffff; border:1px solid #94a3b8;"></div><span>Not Visited</span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#fee2e2; border:1px solid #fca5a5;"></div><span>Not Answered</span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#dcfce7; border:1px solid #86efac;"></div><span>Answered</span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#f3e8ff; border:1px solid #d8b4fe;"></div><span>Marked</span></div>
+                </div>
+                <div class="palette-grid" id="palette-grid"></div>
+                <button class="submit-exam-btn" onclick="openSubmitModal()">Submit Examination</button>
+            </aside>
+        </div>
+    </div>
+
+    <!-- SUBMISSION CONFIRMATION MODAL -->
+    <div id="submit-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Confirm Examination Submission</h3>
+            <p style="margin-bottom: 15px; font-size: 14px; color: var(--text-light);">Please review your examination summary before final submission:</p>
+            <div class="modal-stats" id="modal-stats-box"></div>
+            <div class="modal-buttons">
+                <button class="btn-action" style="flex:1;" onclick="closeSubmitModal()">Cancel / Return</button>
+                <button class="btn-action btn-primary-action" style="flex:1; background: var(--success-green);" onclick="confirmFinalSubmission()">Submit Final Answer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="screen">
+        <div class="result-card">
+            <h2>Examination Completed Successfully</h2>
+            <p style="color: var(--text-light); margin-bottom: 15px;">Advanced Computer Theory Assessment</p>
+            
+            <div class="score-circle">
+                <div id="score-val">0</div>
+                <span>Out of 100</span>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-item">Percentage: <span id="res-percentage">0%</span></div>
+                <div class="result-item">Attempted: <span id="res-attempted">0</span></div>
+                <div class="result-item">Correct Answers: <span id="res-correct">0</span></div>
+                <div class="result-item">Incorrect Answers: <span id="res-incorrect">0</span></div>
+                <div class="result-item" style="grid-column: span 2;">Unattempted Questions: <span id="res-unattempted">100</span></div>
+            </div>
+
+            <p id="performance-remark" style="font-weight: 600; color: var(--secondary-blue); margin-bottom: 20px;"></p>
+            <button class="btn" onclick="restartPortal()">Log Out / Restart Examination</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestionBank = [
+            // NOTEPAD, WORDPAD & MS PAINT (1 - 10)
+            { id: 1, question: "What is the default file extension for documents created in Windows Notepad?", options: [".txt", ".doc", ".rtf", ".odt"], answer: 0 },
+            { id: 2, question: "Which rich text editor introduced in Windows supports OLE objects and embedded images natively while using the .rtf extension?", options: ["WordPad", "Notepad", "MS Paint", "Command Prompt"], answer: 0 },
+            { id: 3, question: "What is the default file format for bitmap images saved in modern versions of MS Paint (.png introduced as default in Windows 7)?", options: [".png", ".bmp", ".jpg", ".gif"], answer: 0 },
+            { id: 4, question: "In MS Paint, which tool is used to sample an exact color from any pixel in the canvas?", options: ["Color Picker (Eyedropper)", "Magnifier", "Fill with color", "Brush tool"], answer: 0 },
+            { id: 5, question: "Does Notepad support complex paragraph formatting, font styling per word, and embedded images?", options: ["No, it only supports plain ASCII/Unicode text without formatting tags", "Yes, fully supports tables and images", "Only in dark mode", "Only when saved as .rtf"], answer: 0 },
+            { id: 6, question: "What is the maximum file size limitation in older 32-bit versions of Windows Notepad due to its text buffer architecture?", options: ["64 KB", "2 GB", "500 MB", "Unlimited"], answer: 0 },
+            { id: 7, question: "In MS Paint, what keyboard shortcut is used to invert the colors of an image selection?", options: ["Ctrl + Shift + I", "Ctrl + I", "Ctrl + Alt + I", "Ctrl + Shift + X"], answer: 0 },
+            { id: 8, question: "Which feature in WordPad allows automatic line wrapping based on the window boundaries rather than explicit paragraph breaks?", options: ["Word Wrap", "Auto Margin", "Text Reflow", "Block Format"], answer: 0 },
+            { id: 9, question: "What is the primary function of the 'Resize and Skew' dialog box in MS Paint?", options: ["To precisely scale image dimensions by percentage/pixels and slant objects by degrees", "To compress image file size for web upload", "To convert bitmap files to vector SVG", "To calibrate printer color profiles"], answer: 0 },
+            { id: 10, question: "Which file format was historically the uncompressed native raster format for MS Paint (.bmp)?", options: ["Windows Bitmap (.bmp)", "Tagged Image File (.tiff)", "Joint Photographic (.jpg)", "Graphic Interchange (.gif)"], answer: 0 },
+
+            // MS DOS FUNDAMENTALS & COMMANDS (11 - 25)
+            { id: 11, question: "What does MS-DOS stand for?", options: ["Microsoft Disk Operating System", "Micro System Digital Operating Software", "Mainframe Disk Operation System", "Multi-User System Disk Operation"], answer: 0 },
+            { id: 12, question: "Which MS-DOS internal command is used to display the list of files and directories in the current folder?", options: ["DIR", "LIST", "SHOW", "CAT"], answer: 0 },
+            { id: 13, question: "Which DOS command is used to create a new subdirectory or folder?", options: ["MKDIR (or MD)", "CRDIR", "NEWDIR", "ADDFOLD"], answer: 0 },
+            { id: 14, question: "What is the function of the 'CD ..' command in MS-DOS?", options: ["Changes the current working directory to its parent directory", "Clears the screen display", "Copies all files to root", "Closes the command interpreter"], answer: 0 },
+            { id: 15, question: "Which command is used to delete or erase files from a directory in MS-DOS?", options: ["DEL (or ERASE)", "REMOVE", "DROP", "CLEAR"], answer: 0 },
+            { id: 16, question: "What does the 'CLS' command execute in the Command Prompt window?", options: ["Clears all text from the screen and resets the cursor to the top-left corner", "Closes the command prompt session instantly", "Checks disk integrity", "Changes text color"], answer: 0 },
+            { id: 17, question: "Which DOS command displays or modifies file attributes such as Read-Only, Archive, System, and Hidden?", options: ["ATTRIB", "PROPS", "SETATTR", "FILEINFO"], answer: 0 },
+            { id: 18, question: "What is the purpose of the 'COPY CON' command in MS-DOS?", options: ["To create a text file directly from the console input", "To copy hard disk partitions", "To format floppy disks", "To configure console resolution"], answer: 0 },
+            { id: 19, question: "Which external command in MS-DOS checks disk drives for logical and physical errors and attempts repair?", options: ["CHKDSK", "SCANREG", "DEFRAG", "DISKFIX"], answer: 0 },
+            { id: 20, question: "What wildcard character represents a single arbitrary character in DOS file search operations?", options: ["? (Question mark)", "* (Asterisk)", "# (Hash)", "$ (Dollar)"], answer: 0 },
+            { id: 21, question: "What wildcard character represents any string of multiple arbitrary characters in file searches?", options: ["* (Asterisk)", "? (Question mark)", "% (Percent)", "& (Ampersand)"], answer: 0 },
+            { id: 22, question: "Which command is used in DOS to format a disk drive, erasing all existing data?", options: ["FORMAT", "CLEAN", "WIPE", "INIT"], answer: 0 },
+            { id: 23, question: "What is the function of the 'XCOPY' command compared to standard 'COPY'?", options: ["XCOPY can copy entire directory trees, subdirectories, and handle deep multi-level structures robustly", "XCOPY encrypts files during transfer", "XCOPY only works on network drives", "There is no difference"], answer: 0 },
+            { id: 24, question: "How do you view the IP configuration details (IP address, Gateway, Subnet) in Windows Command Prompt?", options: ["ipconfig", "netstat", "ping", "tracert"], answer: 0 },
+            { id: 25, question: "Which network diagnostic tool in DOS/Windows sends ICMP echo request packets to test host reachability?", options: ["ping", "nslookup", "arp", "route"], answer: 0 },
+
+            // SHORTCUT KEYS & FULL FORMS (26 - 45)
+            { id: 26, question: "What is the universal keyboard shortcut to open the 'Save As' dialog box in most Windows applications?", options: ["F12", "Ctrl + S", "Ctrl + Shift + S", "Alt + S"], answer: 0 },
+            { id: 27, question: "What does the full form of BIOS stand for in computer architecture?", options: ["Basic Input Output System", "Binary Integrated Operating System", "Built-in Internal Operational Software", "Basic Interactive Object Sequence"], answer: 0 },
+            { id: 28, question: "What is the full form of POST during computer boot-up sequence?", options: ["Power-On Self-Test", "Primary Operating System Test", "Program Object State Table", "Pre-Operating System Trigger"], answer: 0 },
+            { id: 29, question: "What does the keyboard shortcut Ctrl + Shift + Esc directly invoke in Windows?", options: ["Task Manager", "Device Manager", "Control Panel", "System Properties"], answer: 0 },
+            { id: 30, question: "What is the full form of PDF?", options: ["Portable Document Format", "Printed Data File", "Public Digital Form", "Page Display Format"], answer: 0 },
+            { id: 31, question: "What does URL stand for in web browsing?", options: ["Uniform Resource Locator", "Universal Record Link", "Unified Reference Line", "Uniform Retrieval Location"], answer: 0 },
+            { id: 32, question: "What is the full form of HTTP?", options: ["HyperText Transfer Protocol", "High Transfer Text Program", "Hybrid Terminal Transmission Protocol", "Hyperlink Text Transmission Process"], answer: 0 },
+            { id: 33, question: "What does HTML stand for?", options: ["HyperText Markup Language", "High-Level Text Management Language", "Hyperlink Transfer Markup Link", "Home Tool Markup Language"], answer: 0 },
+            { id: 34, question: "What is the full form of RAM?", options: ["Random Access Memory", "Read Access Module", "Rapid Allocation Memory", "Realtime Accessible Microchip"], answer: 0 },
+            { id: 35, question: "What does ROM stand for?", options: ["Read Only Memory", "Rapid Online Module", "Record-Only Media", "Random Output Microchip"], answer: 0 },
+            { id: 36, question: "What is the full form of USB?", options: ["Universal Serial Bus", "Unified System Board", "Ultra Speed Bridge", "Universal Storage Block"], answer: 0 },
+            { id: 37, question: "What does GUI stand for in operating system design?", options: ["Graphical User Interface", "General Utility Index", "Graphical Unified Integration", "Global User Interaction"], answer: 0 },
+            { id: 38, question: "What is the full form of SMPS in computer power supply units?", options: ["Switched-Mode Power Supply", "Synchronous Main Power System", "System Master Power Switch", "Standard Modular Power Source"], answer: 0 },
+            { id: 39, question: "What does FTP stand for?", options: ["File Transfer Protocol", "Fast Text Parser", "File Transmission Program", "Folder Transfer Path"], answer: 0 },
+            { id: 40, question: "What is the full form of LAN?", options: ["Local Area Network", "Logical Access Node", "Line Area Number", "Long Array Network"], answer: 0 },
+            { id: 41, question: "What does WAN stand for?", options: ["Wide Area Network", "Wireless Access Node", "Web Application Network", "Window Area Network"], answer: 0 },
+            { id: 42, question: "What is the full form of IP in networking?", options: ["Internet Protocol", "Information Provider", "Internal Program", "Interchange Port"], answer: 0 },
+            { id: 43, question: "What does DNS stand for?", options: ["Domain Name System", "Digital Network Service", "Data Node Security", "Dynamic Name Switch"], answer: 0 },
+            { id: 44, question: "What is the full form of SSD?", options: ["Solid State Drive", "System Storage Device", "Super Speed Disk", "Static Serial Drive"], answer: 0 },
+            { id: 45, question: "What does LED stand for in display technology?", options: ["Light Emitting Diode", "Liquid Electron Display", "Light Electronic Device", "Low Energy Display"], answer: 0 },
+
+            // MS WORD (ADVANCED) (46 - 60)
+            { id: 46, question: "What feature in MS Word allows you to generate personalized mass mailings (letters, envelopes, email labels) by merging a main document with a data source?", options: ["Mail Merge", "Document Sync", "Bulk Dispatch", "Form Letter Wizard"], answer: 0 },
+            { id: 47, question: "What is the purpose of Section Breaks in MS Word?", options: ["To allow different headers, footers, page numbering formats, and margins within different parts of the same document", "To split a single paragraph across two files", "To encrypt individual chapters", "To lock document templates"], answer: 0 },
+            { id: 48, question: "What is the function of Track Changes in MS Word?", options: ["To record and highlight all insertions, deletions, and formatting edits made by reviewers for collaborative auditing", "To log user login timestamps", "To monitor print job history", "To track cloud sync status"], answer: 0 },
+            { id: 49, question: "How do you create a custom Table of Contents in MS Word automatically?", options: ["By applying built-in Heading styles (Heading 1, 2, 3) to titles and inserting TOC from References tab", "By typing page numbers manually", "By converting tables to text", "By using Mail Merge fields"], answer: 0 },
+            { id: 50, question: "What is a Macro in Microsoft Word?", options: ["A recorded sequence of VBA (Visual Basic for Applications) commands and keystrokes automating repetitive tasks", "A large vector graphic object", "An automated spell checker", "A macro-level security certificate"], answer: 0 },
+            { id: 51, question: "What is the difference between Footnotes and Endnotes in Word?", options: ["Footnotes appear at the bottom of the current page; Endnotes appear at the very end of the document or section", "Footnotes are for math formulas, Endnotes for text", "Footnotes cannot exceed 3 lines", "There is no functional difference"], answer: 0 },
+            { id: 52, question: "What does the Format Painter tool do across multiple elements when double-clicked?", options: ["Locks the painter tool active so formatting can be pasted consecutively onto multiple selections until deactivated", "Copies formatting to clipboard permanently", "Applies global styles", "Creates a macro"], answer: 0 },
+            { id: 53, question: "What is the function of the Navigation Pane in Word?", options: ["To provide an outline-based document map allowing instant heading jumps, search filtering, and page thumbnail browsing", "To navigate web links", "To control ribbon tabs", "To manage window layouts"], answer: 0 },
+            { id: 54, question: "What is a Watermark in MS Word?", options: ["Faint background text or image displayed behind document body text (e.g., 'CONFIDENTIAL', 'DRAFT')", "A border around table cells", "A digital signature security hash", "An automatic page footer"], answer: 0 },
+            { id: 55, question: "What is the purpose of 'Keep with next' paragraph pagination property?", options: ["To prevent awkward page breaks by ensuring a heading stays on the same page as the following paragraph", "To force paragraphs onto new pages", "To link two separate files", "To eliminate line spacing"], answer: 0 },
+            { id: 56, question: "Which feature allows multiple users to collaborate and edit a cloud-stored Word document simultaneously in real time?", options: ["Real-time Co-authoring", "Track Merge", "Global Sync", "Shared Lockout"], answer: 0 },
+            { id: 57, question: "What is the purpose of the Style Inspector pane in Word?", options: ["To view direct formatting applied to text versus style-defined formatting and clear overrides easily", "To inspect macro security", "To check table border widths", "To analyze word count statistics"], answer: 0 },
+            { id: 58, question: "What happens when you insert a 'Continuous' Section Break?", options: ["It starts a new section on the same page without forcing a page break", "It forces a page break immediately", "It creates a landscape page", "It deletes subsequent paragraphs"], answer: 0 },
+            { id: 59, question: "What is the function of XML-based `.docx` file format introduced in Office 2007?", options: ["Compresses document contents into a structured ZIP package containing XML markup files for better data recovery and interoperability", "Stores documents strictly as raw binary streams", "Encrypts all text automatically", "Converts files to vector graphics"], answer: 0 },
+            { id: 60, question: "What shortcut opens the Thesaurus pane for finding synonyms in Microsoft Word?", options: ["Shift + F7", "F7", "Ctrl + F7", "Alt + F7"], answer: 0 },
+
+            // MS EXCEL (ADVANCED & FORMULAS) (61 - 75)
+            { id: 61, question: "What is the correct syntax for an `VLOOKUP` formula in Excel searching for a value in column 1 and returning column 3 with exact match?", options: ["=VLOOKUP(lookup_value, table_array, 3, FALSE)", "=VLOOKUP(table_array, lookup_value, 3, 0)", "=VLOOKUP(3, lookup_value, table_array, TRUE)", "=VLOOKUP(lookup_value, 3, table_array)"], answer: 0 },
+            { id: 62, question: "What is the primary advantage of `XLOOKUP` over traditional `VLOOKUP`?", options: ["It can search in any direction (left or right), defaults to exact match, and handles columns dynamically without strict column index numbers", "It only works on numerical data", "It is 100 times faster on cloud files", "It does not require table arrays"], answer: 0 },
+            { id: 63, question: "What does the formula `=INDEX(A1:C10, 2, 3)` return?", options: ["The value located in the 2nd row and 3rd column of the range A1:C10", "The sum of row 2 and column 3", "The 23rd cell in the sheet", "An error because INDEX requires 4 arguments"], answer: 0 },
+            { id: 64, question: "How does an Absolute Cell Reference differ from a Relative Cell Reference in Excel formulas?", options: ["Absolute references (using $ signs like $A$1) remain fixed when copied across cells; relative references adjust automatically", "Absolute references calculate faster", "Relative references are permanent", "There is no difference"], answer: 0 },
+            { id: 65, question: "What is the purpose of Excel PivotTables?", options: ["To dynamically summarize, analyze, explore, and present large volumes of summary data without altering raw source tables", "To create animated 3D charts", "To lock sheet cells from editing", "To run VBA macros automatically"], answer: 0 },
+            { id: 66, question: "What does the formula `=IFERROR(A1/B1, \"Error in Calc\")` evaluate if `B1` is zero?", options: ["It displays \"Error in Calc\" instead of crashing with `#DIV/0!` error", "It returns zero", "It returns `#DIV/0!`", "It halts spreadsheet calculation"], answer: 0 },
+            { id: 67, question: "What function is used to count cells that meet a specified single criteria range?", options: ["COUNTIF", "COUNT", "COUNTA", "COUNTBLANK"], answer: 0 },
+            { id: 68, question: "What function evaluates multiple criteria across multiple ranges before summing values?", options: ["SUMIFS", "SUMIF", "SUM", "DSUM"], answer: 0 },
+            { id: 69, question: "What is the function of Conditional Formatting in Excel?", options: ["To automatically change cell formatting (colors, data bars, icon sets) based on cell values or formula conditions", "To restrict cell data entry to numbers only", "To password protect individual worksheets", "To format pivot table layouts"], answer: 0 },
+            { id: 70, question: "What does the shortcut `Ctrl + Shift + L` do in an Excel worksheet?", options: ["Toggles AutoFilter drop-down arrows on or off for the selected table range", "Creates a line chart", "Locks worksheet layers", "Left-aligns cell text"], answer: 0 },
+            { id: 71, question: "What is the purpose of Data Validation in Excel?", options: ["To control and restrict the type of data or values users can enter into a cell (e.g., dropdown lists, number ranges, dates)", "To validate macro security certificates", "To check spelling errors across sheets", "To verify formula syntax correctness"], answer: 0 },
+            { id: 72, question: "What does the formula `=MATCH(\"Apple\", A1:A10, 0)` return?", options: ["The relative position (row number) of \"Apple\" within the range A1:A10 using an exact match", "The actual text \"Apple\"", "The total count of apples", "True or False"], answer: 0 },
+            { id: 73, question: "What shortcut opens the Format Cells dialog box (`Ctrl + 1`)?", options: ["Ctrl + 1", "Ctrl + Shift + F", "Alt + F1", "Ctrl + D"], answer: 0 },
+            { id: 74, question: "What is the function of Goal Seek in Excel's What-If Analysis tools?", options: ["To find the required input value for a formula by specifying a desired target output result", "To solve complex linear programming equations with multiple variables", "To forecast future stock prices automatically", "To generate random simulation data"], answer: 0 },
+            { id: 75, question: "What does the function `=XMATCH(lookup_value, lookup_array)` return?", options: ["The exact relative position of an item in an array or range of cells", "The lookup value itself", "The boolean match status", "The column index number"], answer: 0 },
+
+            // MS POWERPOINT (PPT) (76 - 85)
+            { id: 76, question: "What is the native file extension for Microsoft PowerPoint presentations in recent versions?", options: [".pptx", ".ppt", ".ppsx", ".potx"], answer: 0 },
+            { id: 77, question: "What is the purpose of the Slide Master in PowerPoint?", options: ["To control the global design template, fonts, colors, placeholder positions, and background elements across all slides in a presentation", "To store hidden backup slides", "To record audio voiceovers", "To convert presentations to video"], answer: 0 },
+            { id: 78, question: "What is the keyboard shortcut to start a slide show presentation from the current slide?", options: ["Shift + F5", "F5", "Ctrl + F5", "Alt + F5"], answer: 0 },
+            { id: 79, question: "What is the keyboard shortcut to start a slide show presentation from the very beginning (Slide 1)?", options: ["F5", "Shift + F5", "Ctrl + Enter", "Alt + F1"], answer: 0 },
+            { id: 80, question: "How do Slide Transitions differ from Custom Animations in PowerPoint?", options: ["Transitions control how the display moves from one slide to the next; Animations control how individual objects/text elements appear and move on a single slide", "Transitions are for audio, animations are for video", "There is no functional difference", "Animations apply to master slides only"], answer: 0 },
+            { id: 81, question: "What is the function of the 'Rehearse Timings' feature in PowerPoint?", options: ["To record the exact duration spent on each slide during practice to automate slide show playback timing", "To check spelling pronunciation", "To limit meeting time length", "To count total words in presentation"], answer: 0 },
+            { id: 82, question: "What file format (`.ppsx`) creates a PowerPoint show that automatically opens directly in Slide Show view rather than editing mode?", options: ["PowerPoint Show", "PowerPoint Template", "PowerPoint Macro-Enabled", "PowerPoint XML"], answer: 0 },
+            { id: 83, question: "What is the purpose of SmartArt in PowerPoint presentations?", options: ["To convert bulleted text into professional hierarchical diagrams, process flows, and relationship charts instantly", "To insert vector clipart graphics", "To create data spreadsheets", "To apply photo filters"], answer: 0 },
+            { id: 84, question: "Can you embed or link Microsoft Excel worksheets and charts directly into a PowerPoint slide?", options: ["Yes, with options for live data updating when the Excel source changes", "No, charts must be recreated manually", "Only as static images", "Only in PDF exports"], answer: 0 },
+            { id: 85, question: "What shortcut key dims the screen to black during a live slide show presentation?", options: ["B", "W", "Esc", "Period (.)"], answer: 0 },
+
+            // MS ACCESS (DATABASES) (86 - 92)
+            { id: 86, question: "What is the native file extension for Microsoft Access database files (recent versions)?", options: [".accdb", ".mdb", ".sql", ".dbf"], answer: 0 },
+            { id: 87, question: "What is the primary function of a Table in a relational database like MS Access?", options: ["To store structured data organized in rows (records) and columns (fields)", "To create user interface buttons", "To generate printable reports", "To execute macros"], answer: 0 },
+            { id: 88, question: "What is a Primary Key in MS Access database tables?", options: ["A unique identifier field (or combination of fields) that uniquely distinguishes each record in a table without duplicates", "A password to encrypt the table", "The first column in datasheet view", "An index for sorting alphabetical names"], answer: 0 },
+            { id: 89, question: "What is the purpose of a Database Query?", options: ["To retrieve, filter, sort, update, or manipulate specific data from one or more tables based on defined criteria", "To design user login forms", "To print physical mailing labels", "To backup database files"], answer: 0 },
+            { id: 90, question: "What does a Foreign Key establish between two tables in a relational database?", options: ["A referential link connecting a field in one table to the Primary Key of another table, enforcing relationship integrity", "A backup copy of records", "An encrypted password key", "A sorting index"], answer: 0 },
+            { id: 91, question: "What is the function of an Access Report?", options: ["To format, calculate, and present database data in a professional, printer-ready layout", "To enter raw data into tables", "To write SQL syntax queries", "To import Excel spreadsheets"], answer: 0 },
+            { id: 92, question: "What is the purpose of Access Forms?", options: ["To provide a user-friendly graphical interface (GUI) for viewing, entering, and editing table records conveniently", "To store raw numerical records", "To execute operating system commands", "To export database schemas"], answer: 0 },
+
+            // HTML (HYPERTEXT MARKUP LANGUAGE) (93 - 100)
+            { id: 93, question: "What tag defines the root container for all HTML content in a web page document?", options: ["<html>", "<root>", "<document>", "<body>"], answer: 0 },
+            { id: 94, question: "Which HTML tag is used to create a hyperlink pointing to other web pages or resources?", options: ["<a> (Anchor tag)", "<link>", "<href>", "<url>"], answer: 0 },
+            { id: 95, question: "What HTML tag is used to display raster or vector images on a web page?", options: ["<img>", "<image>", "<pic>", "<media>"], answer: 0 },
+            { id: 96, question: "What is the correct HTML tag for inserting the largest section heading (Heading 1)?", options: ["<h1>", "<head>", "<heading>", "<h6ο>"], answer: 0 },
+            { id: 97, question: "Which HTML tag creates an unordered (bulleted) list?", options: ["<ul>", "<ol>", "<li>", "<list>"], answer: 0 },
+            { id: 98, question: "Which HTML tag creates an ordered (numbered) list?", options: ["<ol>", "<ul>", "<list>", "<dl>"], answer: 0 },
+            { id: 99, question: "What attribute is used inside an `<img>` tag to specify the image source file path?", options: ["src", "href", "link", "path"], answer: 0 },
+            { id: 100, question: "What is the purpose of the `<!DOCTYPE html>` declaration at the very top of an HTML5 document?", options: ["To inform the web browser about the document type and ensure rendering in modern standards mode", "To import external CSS stylesheets", "To connect to a SQL database", "To execute JavaScript functions"], answer: 0 }
+        ];
+
+        let currentUser = null;
+        let activeSessionKey = null;
+        let currentQuestionIndex = 0;
+        let questions = [];
+        let userAnswers = {};
+        let questionStatus = {};
+        let timerInterval = null;
+        let timeRemaining = 3600;
+        let examSubmitted = false;
+
+        const validCredentials = {
+            "admin100": "100",
+            "admin101": "101"
+        };
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('password');
+            const btn = document.querySelector('.toggle-password');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                btn.textContent = 'Hide';
+            } else {
+                pwdInput.type = 'password';
+                btn.textContent = 'Show';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errBox = document.getElementById('login-error');
+
+            if (validCredentials[user] && validCredentials[user] === pass) {
+                currentUser = user;
+                activeSessionKey = `cbt_advanced_session_${currentUser}`;
+                errBox.style.display = 'none';
+                document.getElementById('display-candidate').textContent = currentUser;
+                switchScreen('instructions-screen');
+            } else {
+                errBox.style.display = 'block';
+            }
+        }
+
+        function toggleStartExamBtn() {
+            const checkbox = document.getElementById('accept-instructions');
+            const btn = document.getElementById('start-exam-btn');
+            if (checkbox.checked) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startExamination() {
+            const savedStateStr = localStorage.getItem(activeSessionKey);
+            if (savedStateStr) {
+                try {
+                    const state = JSON.parse(savedStateStr);
+                    questions = state.questions;
+                    userAnswers = state.userAnswers;
+                    questionStatus = state.questionStatus;
+                    currentQuestionIndex = state.currentQuestionIndex;
+                    timeRemaining = state.timeRemaining;
+                } catch(e) {
+                    initNewSession();
+                }
+            } else {
+                initNewSession();
+            }
+
+            switchScreen('exam-screen');
+            initPalette();
+            loadQuestion(currentQuestionIndex);
+            startTimer();
+        }
+
+        function initNewSession() {
+            questions = rawQuestionBank.map(q => {
+                const originalOptionsWithIndex = q.options.map((opt, idx) => ({ text: opt, isCorrect: idx === q.answer }));
+                const shuffledOpts = shuffleArray(originalOptionsWithIndex);
+                const newAnswerIndex = shuffledOpts.findIndex(o => o.isCorrect);
+                return {
+                    id: q.id,
+                    question: q.question,
+                    options: shuffledOpts.map(o => o.text),
+                    answer: newAnswerIndex
+                };
+            });
+            questions = shuffleArray(questions);
+
+            userAnswers = {};
+            questionStatus = {};
+            questions.forEach(q => {
+                questionStatus[q.id] = 'not-visited';
+            });
+            currentQuestionIndex = 0;
+            timeRemaining = 3600;
+            saveSessionState();
+        }
+
+        function saveSessionState() {
+            if (!activeSessionKey || examSubmitted) return;
+            const state = {
+                questions,
+                userAnswers,
+                questionStatus,
+                currentQuestionIndex,
+                timeRemaining
+            };
+            localStorage.setItem(activeSessionKey, JSON.stringify(state));
+        }
+
+        let timerStartTime = null;
+        let initialDuration = 3600;
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            const sessionTimerKey = `${activeSessionKey}_timer_start`;
+            const storedStartTime = localStorage.getItem(sessionTimerKey);
+            const savedStateStr = localStorage.getItem(activeSessionKey);
+            let savedTime = 3600;
+            if(savedStateStr) {
+                try {
+                    savedTime = JSON.parse(savedStateStr).timeRemaining;
+                } catch(e) {}
+            }
+
+            if (!storedStartTime) {
+                timerStartTime = Date.now();
+                initialDuration = savedTime;
+                localStorage.setItem(sessionTimerKey, timerStartTime);
+                localStorage.setItem(`${activeSessionKey}_duration`, initialDuration);
+            } else {
+                timerStartTime = parseInt(storedStartTime, 10);
+                initialDuration = parseInt(localStorage.getItem(`${activeSessionKey}_duration`) || '3600', 10);
+            }
+
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                const elapsedSeconds = Math.floor((Date.now() - timerStartTime) / 1000);
+                timeRemaining = initialDuration - elapsedSeconds;
+
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    updateTimerDisplay();
+                    clearInterval(timerInterval);
+                    autoSubmitExamination();
+                    return;
+                }
+                updateTimerDisplay();
+                saveSessionState();
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            const displayStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            const timerEl = document.getElementById('timer-display');
+            if (timerEl) {
+                timerEl.textContent = displayStr;
+            }
+        }
+
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questions[currentQuestionIndex];
+            
+            document.getElementById('question-number-tag').textContent = `Question ${currentQuestionIndex + 1} of 100`;
+            document.getElementById('question-title-text').textContent = q.question;
+
+            if (questionStatus[q.id] === 'not-visited') {
+                questionStatus[q.id] = 'visited-not-answered';
+            }
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = userAnswers[q.id] === optIdx;
+                const optDiv = document.createElement('div');
+                optDiv.className = `option-item ${isSelected ? 'selected' : ''}`;
+                optDiv.innerHTML = `
+                    <input type="radio" name="q_opt" id="opt_${optIdx}" ${isSelected ? 'checked' : ''} onchange="selectOption(${optIdx})">
+                    <label for="opt_${optIdx}" style="cursor:pointer; flex:1;">${optText}</label>
+                `;
+                optDiv.onclick = (e) => {
+                    if(e.target.tagName !== 'INPUT') {
+                        document.getElementById(`opt_${optIdx}`).checked = true;
+                    }
+                    selectOption(optIdx);
+                };
+                optionsContainer.appendChild(optDiv);
+            });
+
+            updatePaletteUI();
+            saveSessionState();
+        }
+
+        function selectOption(optIdx) {
+            const q = questions[currentQuestionIndex];
+            userAnswers[q.id] = optIdx;
+            
+            if (questionStatus[q.id] === 'marked') {
+                questionStatus[q.id] = 'answered-marked';
+            } else {
+                questionStatus[q.id] = 'answered';
+            }
+            updatePaletteUI();
+            
+            document.querySelectorAll('.option-item').forEach((el, idx) => {
+                if (idx === optIdx) el.classList.add('selected');
+                else el.classList.remove('selected');
+            });
+            saveSessionState();
+        }
+
+        function clearResponse() {
+            const q = questions[currentQuestionIndex];
+            delete userAnswers[q.id];
+            if (questionStatus[q.id] === 'answered-marked') {
+                questionStatus[q.id] = 'marked';
+            } else {
+                questionStatus[q.id] = 'visited-not-answered';
+            }
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function saveAndNext() {
+            if (currentQuestionIndex < questions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        function markForReviewAndNext() {
+            const q = questions[currentQuestionIndex];
+            if (userAnswers[q.id] !== undefined) {
+                questionStatus[q.id] = 'answered-marked';
+            } else {
+                questionStatus[q.id] = 'marked';
+            }
+            if (currentQuestionIndex < questions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                updatePaletteUI();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function jumpToQuestion(index) {
+            loadQuestion(index);
+        }
+
+        function initPalette() {
+            const grid = document.getElementById('palette-grid');
+            grid.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'palette-btn not-visited';
+                btn.id = `pal_btn_${idx}`;
+                btn.textContent = idx + 1;
+                btn.onclick = () => jumpToQuestion(idx);
+                grid.appendChild(btn);
+            });
+            updatePaletteUI();
+        }
+
+        function updatePaletteUI() {
+            questions.forEach((q, idx) => {
+                const btn = document.getElementById(`pal_btn_${idx}`);
+                if (!btn) return;
+                
+                const status = questionStatus[q.id];
+                btn.className = 'palette-btn';
+                
+                if (idx === currentQuestionIndex) {
+                    btn.classList.add('current');
+                }
+
+                if (status === 'not-visited') btn.classList.add('not-visited');
+                else if (status === 'visited-not-answered') btn.classList.add('visited-not-answered');
+                else if (status === 'answered') btn.classList.add('answered');
+                else if (status === 'marked') btn.classList.add('marked');
+                else if (status === 'answered-marked') btn.classList.add('answered-marked');
+            });
+        }
+
+        function openSubmitModal() {
+            if (examSubmitted) return;
+            
+            let answeredCount = 0;
+            let notAnsweredCount = 0;
+            let markedCount = 0;
+            let notVisitedCount = 0;
+
+            questions.forEach(q => {
+                const s = questionStatus[q.id];
+                if (s === 'answered' || s === 'answered-marked') answeredCount++;
+                if (s === 'visited-not-answered') notAnsweredCount++;
+                if (s === 'marked') markedCount++;
+                if (s === 'not-visited') notVisitedCount++;
+            });
+
+            const statsBox = document.getElementById('modal-stats-box');
+            statsBox.innerHTML = `
+                <div><span>Answered:</span> <strong>${answeredCount}</strong></div>
+                <div><span>Not Answered:</span> <strong>${notAnsweredCount}</strong></div>
+                <div><span>Marked for Review:</span> <strong>${markedCount}</strong></div>
+                <div><span>Not Visited:</span> <strong>${notVisitedCount}</strong></div>
+                <div><span>Total Questions:</span> <strong>100</strong></div>
+            `;
+
+            document.getElementById('submit-modal').style.display = 'flex';
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submit-modal').style.display = 'none';
+        }
+
+        function confirmFinalSubmission() {
+            if (examSubmitted) return;
+            examSubmitted = true;
+            closeSubmitModal();
+            if (timerInterval) clearInterval(timerInterval);
+
+            let correct = 0;
+            let attempted = 0;
+
+            questions.forEach(q => {
+                if (userAnswers[q.id] !== undefined) {
+                    attempted++;
+                    if (userAnswers[q.id] === q.answer) {
+                        correct++;
+                    }
+                }
+            });
+
+            const incorrect = attempted - correct;
+            const unattempted = 100 - attempted;
+            const marksObtained = correct;
+            const percentage = correct;
+
+            document.getElementById('score-val').textContent = marksObtained;
+            document.getElementById('res-percentage').textContent = `${percentage}%`;
+            document.getElementById('res-attempted').textContent = attempted;
+            document.getElementById('res-correct').textContent = correct;
+            document.getElementById('res-incorrect').textContent = incorrect;
+            document.getElementById('res-unattempted').textContent = unattempted;
+
+            const remarkEl = document.getElementById('performance-remark');
+            if (marksObtained >= 85) {
+                remarkEl.textContent = "Outstanding performance! Expert mastery of advanced computer theory and applications.";
+            } else if (marksObtained >= 60) {
+                remarkEl.textContent = "Good performance! Solid technical knowledge with minor areas for review.";
+            } else if (marksObtained >= 40) {
+                remarkEl.textContent = "Fair performance. Review OS commands, formulas, and keyboard shortcuts.";
+            } else {
+                remarkEl.textContent = "Needs improvement. Thorough study of core computer science concepts recommended.";
+            }
+
+            localStorage.removeItem(activeSessionKey);
+            localStorage.removeItem(`${activeSessionKey}_timer_start`);
+            localStorage.removeItem(`${activeSessionKey}_duration`);
+
+            switchScreen('result-screen');
+        }
+
+        function autoSubmitExamination() {
+            if (examSubmitted) return;
+            alert("Examination time has expired. Your test will be submitted automatically.");
+            confirmFinalSubmission();
+        }
+
+        function restartPortal() {
+            localStorage.clear();
+            window.location.reload();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
